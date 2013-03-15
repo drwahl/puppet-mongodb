@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+### THIS FILE IS MANAGED BY PUPPET
+### <%= file %>
+
+#if the replica set is already initialized, this script will exit(0). if the
+#set is not setup yet, then this script will exit(1)
+
+from pymongo import Connection
+import sys
+
+configFile = '/etc/mongod.conf'
+
+f = open(configFile)
+
+port = 27017
+for line in f.readlines():
+    if line.startswith('port'):
+        port = int(line.split('=')[1].strip())
+
+replSetStatus = {}
+try:
+    con = Connection('localhost:%i' % port)
+    db = con['admin']
+    replSetStatus = db.command('replSetGetStatus')
+    con.close()
+except:
+    replSetStatus['ok'] = 0
+
+if int(replSetStatus['ok']) == 0:
+    sys.exit(1)
+else:
+    sys.exit(0)

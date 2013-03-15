@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+### THIS FILE IS MANAGED BY PUPPET
+### <%= file %>
+
+from pymongo import Connection
+import sys
+
+if not sys.argv[1]:
+    print "Please supply a host to verify"
+    sys.exit(1)
+
+configFile = '/etc/mongod.conf'
+
+f = open(configFile)
+
+port = 27017
+for line in f.readlines():
+    if line.startswith('port'):
+        port = int(line.split('=')[1].strip())
+
+con = Connection('localhost:%i' % port)
+db = con['admin']
+
+replSetStatus = {}
+try:
+    replSetStatus = db.command('replSetGetStatus')
+except:
+    replSetStatus = False
+
+con.close()
+
+#append the standard port if no port is given
+if not ":" in sys.argv[1]:
+    host_to_query = sys.argv[1] + ":27017"
+else:
+    host_to_query = sys.argv[1]
+
+for rs_host in replSetStatus['members']:
+    if host_to_query in rs_host['name']:
+        print "found %s in replica set" % host_to_query
+        sys.exit(0)
+
+print "host %s not found in replica set" % host_to_query
+#attempt to connect to verify mongodb is ready to be added to the replica set
+try:
+    newhost_con = Connection(host_to_query)
+    newhost_con.close()
+    print "%s is ready to be added to replica set" % host_to_query
+except:
+    print "mongodb does not appear to be configured on %s" % host_to_query
+    sys.exit(1)

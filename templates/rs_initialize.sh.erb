@@ -1,0 +1,8 @@
+#!/bin/bash                                                                     
+### THIS FILE IS MANAGED BY PUPPET                                              
+### <%= file %>                                                                 
+                                                                                
+port=`grep ^port /etc/mongod.conf | cut -d"=" -f2 | sed -e 's/ //g'`
+mongo_host=`hostname`:$port                                                     
+                                                                                
+mongo --quiet --eval rs.initiate\(\"$mongo_host\"\) $mongo_host

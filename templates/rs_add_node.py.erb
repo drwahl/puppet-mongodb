@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+import sys
+import subprocess
+import socket
+import json
+
+configFile = '/etc/mongod.conf'
+
+f = open(configFile)
+
+port = 27017
+for line in f.readlines():
+    if line.startswith('port'):
+        port = int(line.split('=')[1].strip())
+hostname = socket.gethostname()
+mongohost = "%s:%s" % (hostname, port)
+
+def runme(cmd):
+    """ run commands in a subprocess and wait for the return code. """
+    proc = subprocess.Popen(cmd, \
+            shell=True, \
+            stdin=subprocess.PIPE, \
+            stdout=subprocess.PIPE, \
+            stderr=subprocess.PIPE)
+    output = proc.communicate()
+
+    return proc.returncode, output
+
+if __name__ == "__main__":
+    
+    add_cmd = "mongo --quiet --eval \"printjson(rs.add('" + sys.argv[1] + "'))\" " + mongohost
+    ret, out = runme(add_cmd)
+    return_message = json.loads(out[0])
+    if return_message['ok'] == 0:
+        if 'errmsg' in return_message:
+            print return_message['errmsg']
+        sys.exit(1)
+    else:
+        sys.exit(0)

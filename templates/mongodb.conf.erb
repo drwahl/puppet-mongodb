@@ -1,0 +1,248 @@
+### THIS FILE IS MANAGED BY PUPPET
+### <%= file %>
+
+# IP address to which the mongod service will bind
+<% if @bind_ip -%>
+bind_ip        = <%= bind_ip %>
+<% else -%>
+#bind_ip        = 0.0.0.0
+<% end -%>
+# TCP port to which the mongod service will bind
+port        = <%= port %>
+# If true, mongod will run in daemon mode. If false,
+# mongod will run in the foreground
+fork        = <%= dbfork %>
+# Filesystem location to store the pidfile
+pidfilepath = <%= pidfilepath %>
+# Filesystem location to write application logs
+logpath     = <%= logpath %>
+# Filesystem location to store database binary data
+dbpath      = <%= dbpath %>
+# Store each DB in a folder under dbpath
+directoryperdb = <%= directoryperdb %>
+# If true, mongod will enable write-ahead journaling
+journal     = <%= journal %>
+
+# Enables periodic logging of CPU utilization and I/O wait
+<% if @cpu -%>
+cpu = <%= cpu %>
+<% else -%>
+#cpu = true
+<% end -%>
+
+# Turn on/off security.  Off is currently the default
+<% if @noauth -%>
+noauth = <%= noauth %>
+<% else -%>
+#noauth = true
+<% end -%>
+<% if @auth -%>
+auth = <%= auth %>
+<% else -%>
+#auth = true
+<% end -%>
+
+# Verbose logging output.
+<% if @verbose -%>
+verbose = <%= verbose %>
+<% else -%>
+#verbose = true
+<% end -%>
+
+# Inspect all client data for validity on receipt (useful for
+# developing drivers)
+<% if @objcheck -%>
+objcheck = <%= objcheck %>
+<% else -%>
+#objcheck = true
+<% end -%>
+
+# Enable db quota management
+<% if @quota -%>
+quota = <%= quota %>
+<% else -%>
+#quota = true
+<% end -%>
+
+# Set oplogging level where n is
+#   0=off (default)
+#   1=W
+#   2=R
+#   3=both
+#   7=W+some reads
+<% if @oplog -%>
+oplog = <%= oplog %>
+<% else -%>
+#oplog = 0
+<% end -%>
+
+# Diagnostic/debugging option
+<% if @nocursors -%>
+nocursors = <%= nocursors %>
+<% else -%>
+#nocursors = true
+<% end -%>
+
+# Ignore query hints
+<% if @nohints -%>
+nohints = <%= nohints %>
+<% else -%>
+#nohints = true
+<% end -%>
+
+# Disable the HTTP interface (Defaults to port+1000).
+<% if @nohttpinterface -%>
+nohttpinterface = <%= nohttpinterface %>
+<% else -%>
+#nohttpinterface = true
+<% end -%>
+
+# Turns off server-side scripting.  This will result in greatly limited
+# functionality
+<% if @noscripting -%>
+noscripting = <%= noscripting %>
+<% else -%>
+#noscripting = true
+<% end -%>
+
+# Turns off table scans.  Any query that would do a table scan fails.
+<% if @notablescan -%>
+notablescan = <%= notablescan %>
+<% else -%>
+#notablescan = true
+<% end -%>
+
+# Disable data file preallocation.
+<% if @noprealloc -%>
+noprealloc = <%= noprealloc %>
+<% else -%>
+#noprealloc = true
+<% end -%>
+
+# Specify .ns file size for new databases.
+<% if @nssize -%>
+nssize = <%= nssize %>
+<% else -%>
+#nssize = <size>
+<% end -%>
+
+# Accout token for Mongo monitoring server.
+<% if @mms_token -%>
+mms-token = <%= mms_token %>
+<% else -%>
+#mms-token = <token>
+<% end -%>
+
+# Server name for Mongo monitoring server.
+<% if @mms_name -%>
+mms-name = <%= mms_name %>
+<% else -%>
+#mms-name = <server-name>
+<% end -%>
+
+# Ping interval for Mongo monitoring server.
+<% if @mms_interval -%>
+mms-interval = <%= mms_interval %>
+<% else -%>
+#mms-interval = <seconds>
+<% end -%>
+
+### Replication Options
+
+###################################################################
+# THE FOLLOWING CLUSTER CONFIG OPTIONS ARE GOING TO BE DEPRECATED #
+# PLEASE USE REPLSET OR SHARDING FOR CLUSTERING ###################
+###################################################################
+# in replicated mongo databases, specify here whether this is a slave or master
+<% if @slave -%>
+slave = <%= slave %>
+<% else -%>
+#slave = true
+<% end -%>
+<% if @slave_source -%>
+source = <%= slave_source %>
+<% else -%>
+#source = master.example.com
+<% end -%>
+# Slave only: specify a single database to replicate
+<% if @slave_only -%>
+only = <%= slave_only %>
+<% else -%>
+#only = master.example.com
+<% end -%>
+# or (CAN NOT BE MASTER AND SLAVE AT THE SAME TIME)
+<% if @master -%>
+master = <%= master %>
+<% else -%>
+#master = true
+<% end -%>
+<% if @master_source -%>
+source = <%= master_source %>
+<% else -%>
+#source = slave.example.com
+<% end -%>
+# Address of a server to pair with.
+<% if @pairwith -%>
+pairwith = <%= pairwith %>
+<% else -%>
+#pairwith = <server:port>
+<% end -%>
+# Automatically resync if slave data is stale
+<% if autoresync == true -%>
+autoresync
+<% else -%>
+#autoresync
+<% end -%>
+###################################################################
+# END DEPRECATED CLUSTERING CONFIG ################################
+###################################################################
+
+# Address of arbiter server.
+<% if @arbiter -%>
+arbiter = <%= arbiter %>
+<% else -%>
+#arbiter = <server:port>
+<% end -%>
+#Replica set clustering config
+### Replication set
+# Name of replica set
+<% if @replset -%>
+replSet = rs0
+<% else -%>
+#replSet =
+<% end -%>
+#After setting this in the config file, you need to login to mongodb and run:
+# rs.initiate()
+# rs.add( "slave1.fqdn.com" )
+# rs.add( "slave2.fqdn.com" )
+# if you have an arbitor in your setup:
+# rs.addArb( "arbiter.fqdn.com" )
+# get replication set info with rs.status()
+
+# Specify whether this is a config server
+<% if @configsvr -%>
+configsvr = <% configsvr %>
+<% else -%>
+#configsvr = false
+<% end -%>
+
+# hosts to look for for configuration. this should be a comma seperated list of
+# at least 3 servers
+<% if @configdb -%>
+configdb = <% configdb %>
+<% else -%>
+#configdb =
+<% end -%>
+
+# Custom size for replication operation log.
+<% if @oplogSize -%>
+oplogSize = <%= oplogSize %>
+<% else -%>
+#oplogSize = <MB>
+<% end -%>
+# Size limit for in-memory storage of op ids.
+<% if @opIdMem -%>
+opIdMem = <%= opIdMem %>
+<% else -%>
+#opIdMem = <bytes>
+<% end -%>
